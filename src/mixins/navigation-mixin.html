@@ -1,0 +1,12 @@
+<script>
+
+	//MokdemElement = MyMixin(Polymer.Element);
+	let NavigationMixin = (superclass) => class extends superclass {
+		constructor() {
+			super();
+			this.navigate=function(event) {
+				this.set('route.path', Polymer.rootPath + event.target.dataset.navigatePath);	
+			}
+		}
+	}
+</script>
