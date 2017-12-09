@@ -10,6 +10,8 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 
 <link rel="import" href="../bower_components/polymer/polymer-element.html">
 <link rel="import" href="mixins/navigation-mixin.html">
+<link rel="import" href="mixins/state-mixin.html">
+<link rel="import" href="mixins/ajax-mixin.html">
 <link rel="import" href="mixins/mixer.html">
 <link rel="import" href="../bower_components/app-layout/app-drawer/app-drawer.html">
 <link rel="import" href="../bower_components/app-layout/app-drawer-layout/app-drawer-layout.html">
@@ -23,6 +25,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 <link rel="import" href="../bower_components/iron-selector/iron-selector.html">
 <link rel="import" href="../bower_components/paper-icon-button/paper-icon-button.html">
 <link rel="import" href="my-icons.html">
+<link rel="import" href="mokdem-nav.html">
 
 <link rel="lazy-import" href="my-view1.html">
 <link rel="lazy-import" href="my-view2.html">
@@ -39,35 +42,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         display: block;
       }
 
-      app-drawer-layout:not([narrow]) [drawer-toggle] {
-        display: none;
-      }
-
-      app-header {
-        color: #fff;
-        background-color: var(--app-primary-color);
-      }
-
-      app-header paper-icon-button {
-        --paper-icon-button-ink-color: white;
-      }
-
-      .drawer-list {
-        margin: 0 20px;
-      }
-
-      .drawer-list a {
-        display: block;
-        padding: 0 16px;
-        text-decoration: none;
-        color: var(--app-secondary-color);
-        line-height: 40px;
-      }
-
-      .drawer-list a.iron-selected {
-        color: black;
-        font-weight: bold;
-      }
+  
     </style>
 
     <app-location
@@ -82,33 +57,25 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         tail="{{subroute}}">
     </app-route>
 
+    <mokdem-nav></mokdem-nav>
 
-        <app-header slot="header" condenses reveals effects="waterfall">
-          <app-toolbar>
-            <paper-icon-button icon="mokdem-icons:home" on-click="navigate" data-navigate-path="home"></paper-icon-button>
-            <div on-click="navigate" data-navigate-path="home" main-title>Mokdem</div>
-            <div on-click="navigate" data-navigate-path="login">
-                          <paper-icon-button  on-click="navigate" data-navigate-path="login" icon="mokdem-icons:account-circle"></paper-icon-button>
-            Login</div>
-          </app-toolbar>
-        </app-header>
-
-        <iron-pages
-            selected="[[page]]"
-            attr-for-selected="name"
-            fallback-selection="my-view404"
-            role="main">
-          <mokdem-home name="home"></mokdem-home>
-          <my-view2 name="my-view2"></my-view2>
-          <mokdem-login name="login"></mokdem-login>
-          <my-view404 name="my-view404"></my-view404>
-        </iron-pages>
+    <iron-pages
+        selected="[[page]]"
+        attr-for-selected="name"
+        fallback-selection="my-view404"
+        role="main">
+      <mokdem-home name="home"></mokdem-home>
+      <my-view2 name="my-view2"></my-view2>
+      <mokdem-login name="login"></mokdem-login>
+      <my-view404 name="my-view404"></my-view404>
+    </iron-pages>
   </template>
 
   <script>
-    class MokdemApp extends mix(Polymer.Element).with(NavigationMixin) {
+    class MokdemApp extends mix(Polymer.Element).with(NavigationMixin, AjaxMixin, StateMixin) {
       constructor() {
         super();
+        this.refreshUserInfo();
       }
       static get is() { return 'mokdem-app'; }
 
@@ -119,8 +86,10 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
             reflectToAttribute: true,
             observer: '_pageChanged',
           },
+          state: Object,
           routeData: Object,
           subroute: String,
+          apiUrl: String,
           // This shouldn't be neccessary, but the Analyzer isn't picking up
           // Polymer.Element#rootPath
           rootPath: String
@@ -151,12 +120,6 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 
       _showPage404() {
         this.page = 'view404';
-      }
-      goHome() {
-        this.set('route.path', Polymer.rootPath + 'home');
-      }
-      goLogin() {
-        this.set('route.path', Polymer.rootPath + 'login');
       }
     }
 

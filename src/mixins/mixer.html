@@ -5,11 +5,13 @@
 	  constructor(superclass) {
 	    this.superclass = superclass;
 	  }
-
-	  with(...mixins) { 
+	  static apply(superclass, ...mixins) { 
 	    return mixins.reduce(
 	    		(c, mixin) => mixin(c)
-	    		, this.superclass);
+	    		, superclass);
+	  }
+	  with(...mixins) { 
+	    return MixinBuilder.apply(this.superclass, ...mixins);
 	  }
 	}
 </script>

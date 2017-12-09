@@ -1,0 +1,43 @@
+<script>
+
+	let AjaxMixin = (superclass) => class extends superclass {
+		constructor() {
+			super();
+			this.serialize=function(object) {
+				return JSON.stringify(object);
+			}
+			this.ajaxGet=function(params) {
+				params.method='get';
+				return this.ajaxRequest(params);
+			}
+			this.ajaxPost=function(params) {
+				params.method='post';
+				return this.ajaxRequest(params);
+			}
+			this.ajaxPut=function(params) {
+				params.method='put';
+				return this.ajaxRequest(params);
+			}
+			this.ajaxDelete=function(params) {
+				params.method='delete';
+				return this.ajaxRequest(params);
+			}
+			this.ajaxRequest=function(params) {
+				if (params.method==undefined) params.method='get';
+
+				let ajax = document.createElement("iron-ajax");
+				ajax.set('method', params.method);
+				ajax.set('url', this.apiUrl + params.url)
+            	ajax.set('handle-as', "json")
+            	ajax.addEventListener('response', params.responseHandler.bind(this));
+            	if (params.body!==undefined)
+            		ajax.set( 'body', this.serialize(params.body));
+		        let request = ajax.generateRequest();
+			}
+		}
+		get apiUrl() {
+			return "http://localhost:6543/api/";
+			//return "https://api.github.com/";
+		}
+	}
+</script>

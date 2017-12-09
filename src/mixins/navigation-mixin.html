@@ -1,11 +1,27 @@
 <script>
 
-	//MokdemElement = MyMixin(Polymer.Element);
+	var MOKDEM = MOKDEM || {}
+	
 	let NavigationMixin = (superclass) => class extends superclass {
+
 		constructor() {
 			super();
-			this.navigate=function(event) {
-				this.set('route.path', Polymer.rootPath + event.target.dataset.navigatePath);	
+			if (MOKDEM.locationElement==undefined)	{ 
+				MOKDEM.locationElement = document.createElement("iron-location");
+				MOKDEM.locationElement.set('id', 'ironLocation');
+				document.body.appendChild(MOKDEM.locationElement);
+			}
+			
+			this.navigateBE=function(path) {
+				MOKDEM.locationElement.set('path', Polymer.rootPath + path);
+			}
+
+			this.navigate=function(eventorpath) {
+				let path;
+				if (eventorpath.target!==undefined)
+					path = eventorpath.target.dataset.navigatePath;
+				else path = eventorpath;
+				this.navigateBE(path);
 			}
 		}
 	}

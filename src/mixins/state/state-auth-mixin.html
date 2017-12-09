@@ -1,0 +1,27 @@
+<script>
+	let StateAuthMixin = (superclass) => class extends superclass {
+		constructor() {
+			super();
+			this._createComputedProperty('loggedIn', '_computeLoggedIn(state)', true);
+			this._computeLoggedIn = function(state) {
+				return state!=undefined && state.user!=undefined && state.user.login!=null;
+			}
+			this.refreshUserInfo = function() {
+				//ajax = this.$.ajaxRefreshUserInfo;
+				//ajax = Polymer.dom(this).appendChild(new IronAjax());
+				//ajax = new IronAjax();
+				let ajax = document.createElement("iron-ajax");
+				ajax.set('id', 'ajaxRefreshUserInfo');
+				ajax.set('url', this.apiUrl + "auth/info")
+            	ajax.set('handle-as', "json")
+            	ajax.set('on-response', "handleRefreshUserInfoResonse")
+				ajax.generateRequest();
+			}
+			this.handleRefreshUserInfoResonse = function(response) {
+				this.setState('user', response)
+			}
+		}
+		
+		
+	}
+</script>

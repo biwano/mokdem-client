@@ -10,7 +10,14 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 
 <link rel="import" href="../bower_components/polymer/polymer-element.html">
 <link rel="import" href="../bower_components/paper-input/paper-input.html">
+<link rel="import" href="../bower_components/paper-button/paper-button.html">
+<link rel="import" href="../bower_components/iron-ajax/iron-ajax.html">
 <link rel="import" href="shared-styles.html">
+<link rel="import" href="mixins/mixer.html">
+<link rel="import" href="mixins/ajax-mixin.html">
+<link rel="import" href="mixins/navigation-mixin.html">
+<link rel="import" href="mixins/state-mixin.html">
+
 
 <dom-module id="mokdem-login">
   <template>
@@ -20,21 +27,47 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 
         padding: 10px;
       }
+            .element {
+        background-color:green;
+
+      }
     </style>
 
     <div class="card">
       <h1>Login</h1>
-      <paper-input always-float-label label="Floating label"></paper-input>
-      <paper-input label="username">
-        <iron-icon icon="mail" slot="prefix"></iron-icon>
-        <div slot="suffix">@email.com</div>
+      <paper-input label="login" value="{{login}}">
+        <iron-icon icon="mokdem-icons:account" slot="prefix"></iron-icon>
       </paper-input>
+      <paper-input label="password"  value="{{password}}" type="password">
+        <iron-icon icon="mokdem-icons:key" slot="prefix"></iron-icon>
+      </paper-input>
+      <paper-button raised class="button-ok" on-click="signIn">Sign in</paper-button>
+      <paper-button raised class="button-cancel" on-click="navigate" data-navigate-path="home">Cancel</paper-button>
     </div>
   </template>
 
   <script>
-    class MokdemLogin extends Polymer.Element {
+    class MokdemLogin extends mix(Polymer.Element).with(AjaxMixin,NavigationMixin,StateMixin) {
       static get is() { return 'mokdem-login'; }
+      static get properties() {
+        return {
+          apiUrl: String,
+          state: Object,
+          login: { type : String, value : 'mok'},
+          password: { type : String, value : 'toto'},
+          ajaxLoginBody: String
+        }
+      }
+      signIn() {
+        this.ajaxPost({ 
+          url: "auth/info",
+          body : { "login":this.login, "password":this.password },
+          responseHandler : (data) => { this.setState('user',data.detail.response); this.navigateBE('home') }
+        });
+      }
+      handleResponse(data) {
+        this.setState('user',data.detail.response);
+      }
     }
 
     window.customElements.define(MokdemLogin.is, MokdemLogin);

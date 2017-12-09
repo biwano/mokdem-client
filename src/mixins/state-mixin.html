@@ -1,0 +1,58 @@
+<link rel="import" href="state/state-auth-mixin.html">
+<link rel="import" href="mixer.html">
+<link rel="import" href="../../../bower_components/iron-ajax/iron-ajax.html">
+
+<script>
+	var MOKDEM = MOKDEM || {}
+	MOKDEM.globalState = {}
+	MOKDEM.globalStates = [MOKDEM.globalState]
+	MOKDEM.stateListeners = []
+
+	//MokdemElement = MyMixin(Polymer.Element);
+	let StateMainMixin = (superclass) => class extends superclass {
+		constructor() {
+			super();
+			MOKDEM.stateListeners.push(this);
+			this.setState=function(path, value) {
+				// construction du nouvel état
+				let newState = this.clone(MOKDEM.globalState)
+				
+				let paths = path.split(".");
+				let currentObject = newState;
+				for (let i=0;i<paths.length-1;i++)
+					currentObject = currentObject[paths[i]];
+				currentObject[paths[paths.length-1]] = value;
+
+				// enregistrement du nouvel état
+				MOKDEM.globalState = newState;
+				MOKDEM.globalStates.push(MOKDEM.globalState);
+
+				// mise à jour du store pour tous les éléments
+				MOKDEM.stateListeners.forEach( (listener) => listener.set('state', MOKDEM.globalState));
+			}
+		}
+	  	clone(obj) {
+	      if (obj === null || typeof(obj) !== 'object' || 'isActiveClone' in obj)
+	        return obj;
+
+	      if (obj instanceof Date)
+	        var temp = new obj.constructor(); //or new Date(obj);
+	      else
+	        var temp = obj.constructor();
+
+	      for (var key in obj) {
+	        if (Object.prototype.hasOwnProperty.call(obj, key)) {
+	          obj['isActiveClone'] = null;
+	          temp[key] = this.clone(obj[key]);
+	          delete obj['isActiveClone'];
+	        }
+	      }
+
+	      return temp;
+	    }
+		
+	}
+	let StateMixin = (superclass) => {
+		return MixinBuilder.apply(superclass, StateMainMixin, StateAuthMixin)
+	}
+</script>
