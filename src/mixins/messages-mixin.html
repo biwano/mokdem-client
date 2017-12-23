@@ -1,0 +1,23 @@
+<script>
+
+	class Message {
+		constructor(type, message) {
+			this.type = type;
+			this.message = message;
+		}
+	}
+
+	let MessagesMixin = (superclass) => class extends superclass {
+
+		constructor() {
+			super();
+			this.messages = [];
+			this.addMessage = function(type, message) {
+				this.push('messages', new Message(type, message));
+			}
+			this.clearMessages = function() {
+				this.set('messages', []);
+			}
+		}
+	}
+</script>

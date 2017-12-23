@@ -21,7 +21,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 <link rel="import" href="components/messages-component.html">
 
 
-<dom-module id="mokdem-login">
+<dom-module id="mokdem-register">
   <template>
     <style include="shared-styles">
       :host {
@@ -36,14 +36,20 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
     </style>
 
     <div class="card">
-      <h1>Login</h1>
-      <paper-input label="login" value="{{login}}">
+      <h1>Register</h1>
+      <paper-input label="Login" value="{{login}}">
         <iron-icon icon="mokdem-icons:account" slot="prefix"></iron-icon>
       </paper-input>
-      <paper-input label="password"  value="{{password}}" type="password">
+      <paper-input label="Password"  value="{{password}}" type="password">
         <iron-icon icon="mokdem-icons:key" slot="prefix"></iron-icon>
       </paper-input>
-      <paper-button raised class$="{{buttonClass}}" on-click="signIn" disabled="[[disabled]]">Sign in</paper-button>
+      <paper-input label="Confirm password"  value="{{confirm_password}}" type="password">
+        <iron-icon icon="mokdem-icons:key" slot="prefix"></iron-icon>
+      </paper-input>
+      <paper-input label="Email"  value="{{email}}" type="email">
+        <iron-icon icon="mokdem-icons:mail" slot="prefix"></iron-icon>
+      </paper-input>
+      <paper-button raised class$="{{buttonClass}}" on-click="register" disabled="[[disabled]]">Register</paper-button>
       <paper-button raised class="button-cancel" on-click="navigate" data-navigate-path="home">Cancel</paper-button><br/>
       
     </div>
@@ -51,43 +57,51 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
   </template>
 
   <script>
-    class MokdemLogin extends mix(Polymer.Element).with(AjaxMixin,NavigationMixin,StateMixin, MessagesMixin) {
+    class MokdemRegister extends mix(Polymer.Element).with(AjaxMixin,NavigationMixin,StateMixin, MessagesMixin) {
       constructor() {
         super();
       }
-      static get is() { return 'mokdem-login'; }
+      static get is() { return 'mokdem-register'; }
       static get properties() {
         return {
           apiUrl: String,
           state: Object,
           login: { type : String, value : ''},
           password: { type : String, value : ''},
+          confirmpassword: { type : String, value : ''},
+          email: { type : String, value : ''},
           ajaxLoginBody: String,
-          disabled: { type:Boolean, computed:"computeDisabled(login,password)"},
+          disabled: { type:Boolean, computed:"computeDisabled(login,password, confirm_password, email)"},
           buttonClass: { type:String, computed:"computeButtonClass(disabled)"},
           messages: Array
         }
       }
-      signIn() {
+      register() {
         this.ajaxPost({ 
-          url: "auth/info",
-          body : { "login":this.login, "password":this.password },
+          url: "auth/register",
+          body : { "login":this.login, "password":this.password, "email":this.email },
           responseHandler : (data) => { 
             this.clearMessages();
-            this.setState('user',data); 
-            if (this.loggedIn) this.navigateBE('home'); 
-            else this.addMessage("error", "Incorrect login information")
+            if (data.status == "ok") {
+              this.refreshUserInfo();
+              this.navigateBE('home'); 
             }
+            else {
+              if (data.status == "error_login_taken") this.addMessage("error", "This login is not available")
+              if (data.status == "error_email_taken") this.addMessage("error", "This email is already registered")
+              
+            }
+          }
         });
       }
-      computeDisabled(login, password) {
-          return this.login=="" || this.password=="";
+      computeDisabled(login, password, confirm_password, email) {
+          return this.login=="" || this.password=="" || this.password!=this.confirm_password || this.email=="";
       }
       computeButtonClass(disabled) {
           return disabled ? "button-disabled" : "button-ok";
       }
     }
 
-    window.customElements.define(MokdemLogin.is, MokdemLogin);
+    window.customElements.define(MokdemRegister.is, MokdemRegister);
   </script>
 </dom-module>

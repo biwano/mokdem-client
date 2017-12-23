@@ -28,8 +28,12 @@
 				let ajax = document.createElement("iron-ajax");
 				ajax.set('method', params.method);
 				ajax.set('url', this.apiUrl + params.url)
-            	ajax.set('handle-as', "json")
-            	ajax.addEventListener('response', params.responseHandler.bind(this));
+            	ajax.set('handleAs', "json")
+            	ajax.set('withCredentials' , true)
+            	if (params.responseHandler!==undefined)
+            		ajax.addEventListener('response', (data) => { 
+            				params.responseHandler.bind(this)(data.detail.response,data) 
+            				} );
             	if (params.body!==undefined)
             		ajax.set( 'body', this.serialize(params.body));
 		        let request = ajax.generateRequest();

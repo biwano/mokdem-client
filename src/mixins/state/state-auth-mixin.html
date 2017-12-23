@@ -7,18 +7,12 @@
 				return state!=undefined && state.user!=undefined && state.user.login!=null;
 			}
 			this.refreshUserInfo = function() {
-				//ajax = this.$.ajaxRefreshUserInfo;
-				//ajax = Polymer.dom(this).appendChild(new IronAjax());
-				//ajax = new IronAjax();
-				let ajax = document.createElement("iron-ajax");
-				ajax.set('id', 'ajaxRefreshUserInfo');
-				ajax.set('url', this.apiUrl + "auth/info")
-            	ajax.set('handle-as', "json")
-            	ajax.set('on-response', "handleRefreshUserInfoResonse")
-				ajax.generateRequest();
-			}
-			this.handleRefreshUserInfoResonse = function(response) {
-				this.setState('user', response)
+				this.ajaxGet({ url: "auth/info"
+					,responseHandler : (data) => { 
+						this.setState('user', data);
+					}
+
+			})
 			}
 		}
 		

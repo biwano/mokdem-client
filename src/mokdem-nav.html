@@ -38,7 +38,9 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
               <toolbar-navigation-item path="home" icon="mokdem-icons:home" text="Mokdem" main-title="true"></toolbar-navigation-item>
               <template is="dom-if" if="{{!loggedIn}}">
                 <toolbar-navigation-item path="login" icon="mokdem-icons:account" text="Login"></toolbar-navigation-item>
+                <toolbar-navigation-item path="register" icon="mokdem-icons:key" text="Register"></toolbar-navigation-item>
               </template>
+              
               <template is="dom-if" if="{{loggedIn}}">
                 {{state.user.login}}
                 <paper-icon-button icon="mokdem-icons:sign-out" on-click="signOut"></paper-icon-button>
@@ -65,7 +67,13 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         this.ajaxDelete({ 
           url: "auth/info",
           body : { "login":this.login, "password":this.password },
-          responseHandler : (data) => { this.setState('user',data.detail.response); this.navigate('home') }
+          responseHandler : (data) => { this.setState('user',data); this.navigate('home') }
+        });
+       }
+       test() {
+        this.ajaxGet({ 
+          url: "auth/info"
+          
         });
        }
       

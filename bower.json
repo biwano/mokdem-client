@@ -15,7 +15,9 @@
     "polymer": "Polymer/polymer#^2.0.0",
     "webcomponentsjs": "webcomponents/webcomponentsjs#^1.0.0",
     "paper-icon-button": "^2.0.1",
-    "paper-input": "^2.0.4"
+    "paper-input": "^2.0.4",
+    "paper-button": "polymerelements/paper-button#^2.0.0",
+    "iron-ajax": "PolymerElements/iron-ajax#^2.0.6"
   },
   "resolutions": {
     "polymer": "^2.0.0",

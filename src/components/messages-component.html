@@ -1,0 +1,28 @@
+<link rel="import" href="../my-icons.html">
+<link rel="import" href="../../bower_components/polymer/polymer-element.html">
+<link rel="import" href="../shared-styles.html">
+
+<dom-module id="messages-component">
+  <template>
+       <style include="shared-styles"></style>
+      <template is="dom-repeat" items="{{messages}}">
+          <paper-button class$="message-{{item.type}}">[[item.message]]</paper-button><br/>
+      </template>
+  </template>
+
+  <script>
+    class MessagesComponent extends Polymer.Element {
+      constructor() {
+        super();
+      }
+      static get is() { return 'messages-component'; }
+
+      static get properties() {
+        return {
+          messages: Array
+        };
+      }
+    }
+    window.customElements.define(MessagesComponent.is, MessagesComponent);
+  </script>
+</dom-module>
